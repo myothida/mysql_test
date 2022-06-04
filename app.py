@@ -28,7 +28,7 @@ from sqlalchemy import create_engine
 # In[2]:
 
 
-db_str = "mysql://dspuser:dsp@2021!@202.144.157.56/dsp_db" #$@L21myo
+db_str = "mysql+mysqldb://dspuser:dsp@2021!@202.144.157.56/dsp_db" #$@L21myo
 db_connection = create_engine(db_str)
 
 
