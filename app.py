@@ -4,8 +4,6 @@
 # In[1]:
 
 
-import pymysql
-
 import pandas as pd
 import numpy as np
 import random
@@ -24,20 +22,27 @@ from dash import Input, Output, State, html
 from dash import Dash, dcc, html, Input, Output
 import dash_bootstrap_components as dbc
 
-get_ipython().run_line_magic('load_ext', 'sql')
+from sqlalchemy import create_engine
 
 
 # In[2]:
 
 
-get_ipython().run_line_magic('sql', 'mysql://dspuser:dsp@2021!@202.144.157.56/dsp_db')
-data = get_ipython().run_line_magic('sql', 'SELECT * FROM student_dtls JOIN students_courses ON students_courses.student_id=student_dtls.student_id JOIN course_master ON course_master.id=students_courses.course_id JOIN dessung_profile ON dessung_profile.cid=student_dtls.cid JOIN dzongkhag_master ON dzongkhag_master.id = dessung_profile.dzongkhag_id JOIN qualifications_master ON qualifications_master.id=dessung_profile.qualification_id;')
-t=pd.DataFrame(data)
-t.rename(columns={8:'CID #',10:'DOB',11:'Email',14:'Name',27:'Programme',35:'DID',38:'Sex',47:'Dzongkhag',49:'Qualification'},inplace=True)
-df=t[['CID #','Name','Programme','DID','Sex','Dzongkhag','Qualification']]
+db_str = "mysql://dspuser:dsp@2021!@202.144.157.56/dsp_db" #$@L21myo
+db_connection = create_engine(db_str)
 
 
 # In[3]:
+
+
+sql_query = "SELECT * FROM student_dtls JOIN students_courses ON students_courses.student_id=student_dtls.student_id JOIN course_master ON course_master.id=students_courses.course_id JOIN dessung_profile ON dessung_profile.cid=student_dtls.cid JOIN dzongkhag_master ON dzongkhag_master.id = dessung_profile.dzongkhag_id JOIN qualifications_master ON qualifications_master.id=dessung_profile.qualification_id;"
+result = db_connection.execute(sql_query)
+result =pd.DataFrame(result)
+result.rename(columns={8:'CID #',10:'DOB',11:'Email',14:'Name',27:'Programme',35:'DID',38:'Sex',47:'Dzongkhag',49:'Qualification'},inplace=True)
+df=result[['CID #','Name','Programme','DID','Sex','Dzongkhag','Qualification']]
+
+
+# In[4]:
 
 
 app = dash.Dash(external_stylesheets=[dbc.themes.JOURNAL, dbc.icons.FONT_AWESOME])
@@ -45,7 +50,7 @@ app.title = "DSP Dashboard"
 server = app.server
 
 
-# In[4]:
+# In[5]:
 
 
 app.layout= dbc.Container([
@@ -61,7 +66,7 @@ app.layout= dbc.Container([
 ])
 
 
-# In[5]:
+# In[6]:
 
 
 @app.callback(
